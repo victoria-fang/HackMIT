@@ -260,7 +260,25 @@
   els.mixed.addEventListener('change', async()=>{ if (!els.mixed.files.length) return; spotifyMode=false; await ensureCtx(); const buf = await fileToAudioBuffer(els.mixed.files[0]); backingBuf = makeInstrumentalSideOnly(buf); vocalBuf = buf; enableButtons(); // try lyrics guess
     const guess = els.mixed.files[0].name.replace(/\.[^/.]+$/, '').split('-'); if (guess.length>=2) fetchLyrics(guess[0].trim(), guess[1].trim()); });
 
-  function makeInstrumentalSideOnly(buf){ const { numberOfChannels, length, sampleRate } = buf; if (numberOfChannels===1){ const out=new AudioBuffer({length,sampleRate,numberOfChannels:1}); out.copyToChannel(buf.getChannelData(0),0); return out; } const L=buf.getChannelData(0), R=buf.getChannelData(1); const out=new AudioBuffer({length,sampleRate,numberOfChannels:2}); const oL=out.getChannelData(0), oR=out.getChannelData(1); for(let i=0;i<length;i++){ const S=0.5*(L[i]-R[i]); oL[i]=S; oR[i]=-S; } normalizeBuffer(out, 0.98); return out; }
+  function makeInstrumentalSideOnly(buf){ 
+    const { numberOfChannels, length, sampleRate } = buf;
+    if (numberOfChannels===1){
+      const out=new AudioBuffer({length,sampleRate,numberOfChannels:1});
+      out.copyToChannel(buf.getChannelData(0),0);
+      return out;
+    }
+    const L=buf.getChannelData(0), R=buf.getChannelData(1);
+    const out=new AudioBuffer({length,sampleRate,numberOfChannels:2});
+    const oL=out.getChannelData(0), oR=out.getChannelData(1);
+    for(let i=0;i<length;i++){
+      const S=0.5*(L[i]-R[i]);
+      oL[i]=S;
+      oR[i]=-S; 
+    }
+    normalizeBuffer(out, 0.98);
+    return out;
+  }
+    
   function normalizeBuffer(buffer, peak=0.98){ const { numberOfChannels, length } = buffer; let maxAbs=0; for(let ch=0; ch<numberOfChannels; ch++){ const d=buffer.getChannelData(ch); for(let i=0;i<length;i++){ const v=Math.abs(d[i]); if(v>maxAbs) maxAbs=v; } } if (maxAbs>0){ const g=peak/maxAbs; for(let ch=0; ch<numberOfChannels; ch++){ const d=buffer.getChannelData(ch); for(let i=0;i<length;i++) d[i]*=g; } } }
 
   // ---------- Two‑file flow ----------
