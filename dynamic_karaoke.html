@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dynamic Karaoke — Full Site</title>
+  <title>Karaoke Helper — Full Site</title>
   <style>
     :root { --bg:#0b1020; --card:#121a32; --text:#e8ecff; --muted:#9aa5d1; --accent:#7aa2ff; }
     *{box-sizing:border-box}
@@ -41,7 +41,7 @@
 </head>
 <body>
   <header>
-    <h1>Dynamic Karaoke — type, upload, or stream 🎤</h1>
+    <h1>Karaoke Helper — type, upload, or stream 🎤</h1>
     <p>Upload full songs, search 30‑sec previews, or connect to Spotify.</p>
   </header>
 
@@ -299,7 +299,7 @@
   let spPlayer=null, spDeviceId=null;
   window.onSpotifyWebPlaybackSDKReady = () => { /* instantiated after login */ };
 
-  async function ensureSpotifyPlayer(){ if(spPlayer) return spPlayer; const token=getSpotifyToken(); if(!token) throw new Error('No Spotify token'); spPlayer = new Spotify.Player({ name:'Dynamic Karaoke Player', getOAuthToken: cb=>cb(getSpotifyToken()), volume:0.9 }); spPlayer.addListener('ready', ({device_id}) => { spDeviceId = device_id; }); spPlayer.addListener('initialization_error', ({message})=>console.error(message)); spPlayer.addListener('authentication_error', ({message})=>console.error(message)); spPlayer.addListener('account_error', ({message})=>console.error(message)); await spPlayer.connect(); return spPlayer; }
+  async function ensureSpotifyPlayer(){ if(spPlayer) return spPlayer; const token=getSpotifyToken(); if(!token) throw new Error('No Spotify token'); spPlayer = new Spotify.Player({ name:'Karaoke Helper Player', getOAuthToken: cb=>cb(getSpotifyToken()), volume:0.9 }); spPlayer.addListener('ready', ({device_id}) => { spDeviceId = device_id; }); spPlayer.addListener('initialization_error', ({message})=>console.error(message)); spPlayer.addListener('authentication_error', ({message})=>console.error(message)); spPlayer.addListener('account_error', ({message})=>console.error(message)); await spPlayer.connect(); return spPlayer; }
 
   function extractTrackUri(input){ if(!input) return null; if(input.startsWith('spotify:track:')) return input; const m=input.match(/open\.spotify\.com\/track\/([A-Za-z0-9]+)/); return m? `spotify:track:${m[1]}`: null; }
   async function transferAndPlay(uri){ const token=getSpotifyToken(); // transfer playback
